@@ -25,7 +25,7 @@ opponent = pygame.Rect(10, screenHeight / 2 - 70, 10, 140)
 # variaveis
 ballSpeedX = 0.5  # 500 pixels por segundo
 ballSpeedY = 0.5
-opponentSpeed = 10
+opponentSpeed = 1
 
 # scores
 playerScore = 0
@@ -96,20 +96,22 @@ def resetBall():
 
 
 def update(dt):
-    global ballSpeedX, ballSpeedY, opponentScore, playerScore, onGameOverScreen
-    # Atualizacao
-    #dt = clock.tick(120)
+    global ballSpeedX, ballSpeedY, opponentScore, playerScore, onGameOverScreen, opponentSpeed
+
     ball.x += ballSpeedX * dt
     ball.y += ballSpeedY * dt
 
-    if opponent.bottom < ball.y:
-        opponent.bottom += opponentSpeed
-    if opponent.top > ball.y:
-        opponent.top -= opponentSpeed
+    # Opponent AI
+    if opponent.bottom < ball.y and ball.x < screenWidth/2:
+        opponent.y += opponentSpeed
+    if opponent.top > ball.y and ball.x < screenWidth/2:
+        opponent.y -= opponentSpeed
 
+    # Bound
     if ball.top <= 0 or ball.bottom >= screenHeight:
         ballSpeedY *= -1
 
+    # Score Marks
     if ball.left >= screenWidth:
         opponentScore += 1
         resetBall()
@@ -117,17 +119,19 @@ def update(dt):
         playerScore += 1
         resetBall()
 
+    # Game Over
     if playerScore == 3 or opponentScore == 3:
         onGameOverScreen = True
 
-    if ball.bottom >= opponent.top and ball.top <= opponent.bottom and ball.left <= opponent.right:
-        delta = ball.centery - opponent.centery
-        ballSpeedY = delta * 0.01
-        ballSpeedX *= -1
-    if ball.bottom >= player.top and ball.top <= player.bottom and ball.right >= player.left:
-        delta = ball.centery - player.centery
-        ballSpeedY = delta * 0.01
-        ballSpeedX *= -1
+    # Colision opponent and ball
+    if ball.colliderect(opponent):
+        ballSpeedX *= -1.05
+    # Colision player and ball
+    if ball.colliderect(player):
+        ballSpeedX *= -1.05
+    # Max Ball Speed
+    if(ballSpeedX>1.5):
+        ballSpeedX = 1.5
 
 
 previous = pygame.time.get_ticks()
