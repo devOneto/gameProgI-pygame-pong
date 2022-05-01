@@ -5,6 +5,7 @@ import sys
 # colors
 blue = (0,0,120)
 white = (200,200,200)
+pureWhite = (255,255,255)
 
 # Inicialização
 pygame.init()
@@ -32,13 +33,21 @@ opponentScore = 0
 
 #load font
 font = pygame.font.SysFont('arial', 50)
+bigFont = pygame.font.SysFont('arial', 200)
+
+# Start Screen Flag
+onStartScreen = True
 
 def inputs():
+    global onStartScreen
     # Processando as entradas (eventos)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+        if event.type == pygame.MOUSEBUTTONUP and onStartScreen:
+            onStartScreen = False
+
     (x, y) = pygame.mouse.get_pos()
     player.y = y - 70
 
@@ -47,23 +56,31 @@ def draw():
 
     global opponentScore, playerScore
 
-    # Desenho
-    screen.fill((0, 0, 0))
-    pygame.draw.ellipse(screen, (200, 200, 200), ball)
-    pygame.draw.rect(screen, (200, 200, 200), player)
-    pygame.draw.rect(screen, (200, 200, 200), opponent)
-    pygame.draw.line(screen, white, (screenWidth/2, 0), (screenWidth/2, screenHeight), 5)
+    if onStartScreen:
+        screen.fill((0, 0, 0))
+        welcomeText = bigFont.render(str("P0NG"), True, pureWhite)
+        pressAnyKeyText = font.render(str("Click to Start..."), True, pureWhite)
+        screen.blit(welcomeText, (screenWidth / 2 - 270, screenHeight/2 - 150))
+        screen.blit(pressAnyKeyText, (screenWidth / 2 - 200, screenHeight/2 +50) )
+        pygame.display.flip()
+    else:
+        # Desenho
+        screen.fill((0, 0, 0))
+        pygame.draw.ellipse(screen, (200, 200, 200), ball)
+        pygame.draw.rect(screen, (200, 200, 200), player)
+        pygame.draw.rect(screen, (200, 200, 200), opponent)
+        pygame.draw.line(screen, white, (screenWidth / 2, 0), (screenWidth / 2, screenHeight), 5)
 
-    # Atualizando a janela 60fps
-    pygame.display.flip()
+        # Atualizando a janela 60fps
+        pygame.display.flip()
 
-    # Render Text
-    # Opponent Score
-    opponentScoreText = font.render( str(opponentScore) , True, white)
-    screen.blit(opponentScoreText, (screenWidth/2 - 65, 50))
-    # Player Score
-    playerScoreText = font.render( str(playerScore) , True, white)
-    screen.blit(playerScoreText, (screenWidth/2 + 40, 50))
+        # Render Text
+        # Opponent Score
+        opponentScoreText = font.render(str(opponentScore), True, white)
+        screen.blit(opponentScoreText, (screenWidth / 2 - 65, 50))
+        # Player Score
+        playerScoreText = font.render(str(playerScore), True, white)
+        screen.blit(playerScoreText, (screenWidth / 2 + 40, 50))
 
     pygame.display.update()
 
