@@ -35,8 +35,9 @@ opponentScore = 0
 font = pygame.font.SysFont('arial', 50)
 bigFont = pygame.font.SysFont('arial', 200)
 
-# Start Screen Flag
+# Start and Finish Screen Flag
 onStartScreen = True
+onGameOverScreen = False
 
 def inputs():
     global onStartScreen
@@ -54,18 +55,22 @@ def inputs():
 
 def draw():
 
-    global opponentScore, playerScore
+    global opponentScore, playerScore, onGameOverScreen
+
+    screen.fill((0, 0, 0))
 
     if onStartScreen:
-        screen.fill((0, 0, 0))
         welcomeText = bigFont.render(str("P0NG"), True, pureWhite)
         pressAnyKeyText = font.render(str("Click to Start..."), True, pureWhite)
         screen.blit(welcomeText, (screenWidth / 2 - 270, screenHeight/2 - 150))
         screen.blit(pressAnyKeyText, (screenWidth / 2 - 200, screenHeight/2 +50) )
         pygame.display.flip()
+    elif onGameOverScreen:
+        endText = bigFont.render(str("GameOver"), True, pureWhite)
+        screen.blit(endText, (140, 330))
+        pygame.display.flip()
     else:
         # Desenho
-        screen.fill((0, 0, 0))
         pygame.draw.ellipse(screen, (200, 200, 200), ball)
         pygame.draw.rect(screen, (200, 200, 200), player)
         pygame.draw.rect(screen, (200, 200, 200), opponent)
@@ -91,7 +96,7 @@ def resetBall():
 
 
 def update(dt):
-    global ballSpeedX, ballSpeedY, opponentScore, playerScore
+    global ballSpeedX, ballSpeedY, opponentScore, playerScore, onGameOverScreen
     # Atualizacao
     #dt = clock.tick(120)
     ball.x += ballSpeedX * dt
@@ -111,6 +116,9 @@ def update(dt):
     if ball.right <= 0:
         playerScore += 1
         resetBall()
+
+    if playerScore == 3 or opponentScore == 3:
+        onGameOverScreen = True
 
     if ball.bottom >= opponent.top and ball.top <= opponent.bottom and ball.left <= opponent.right:
         delta = ball.centery - opponent.centery
